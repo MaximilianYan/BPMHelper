@@ -5,6 +5,7 @@ include_directories(headers)
 
 add_executable(${PROJECT_NAME}
                     sources/main.cpp
+                    sources/BPMHelper.cpp
                     )
 
 include_directories("D:/programming/libraries/opencv-4.5.5/build-release/install/include")
