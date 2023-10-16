@@ -20,11 +20,23 @@
   */
 class Credits {
 public:
-    Credits();
+    Credits();                                                  ///< Create empty object (calling Credits::upload is necessary)
+    
+    ///< Upload images with credits text and layout (text : RGBA, layout : RGB)
+    Credits(const std::string& fileNameText, const std::string& fileNameLayout);
 
-    void upload(std::string textFile, std::string zonesFile); ///< Upload images with credits text and 
+    ///< Upload images with credits text and layout (text : RGBA, layout : RGB)
+    void upload(const std::string& fileNameText, const std::string& fileNameLayout);
+
+    void setAppearVelocity(const cv::Vec2d& appearVelocity);    ///< Set velocity of time shift (pixels per frame)
+    void setDisappearDelay(const double& disappearDelay);       ///< Time from appearing to disappearing (in frames)
+
+    void render(const std::string& outputPath);
 
 private:
-    cv::Mat zones;
-    cv::Mat text;
+    cv::Mat imgLayout;
+    cv::Mat imgText;
+
+    cv::Vec2d appearVelocity;   ///< Velocity of time shift (pixels per frame)
+    double disappearDelay;      ///< Time from appearing to disappearing (in frames)
 };
