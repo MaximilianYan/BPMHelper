@@ -16,3 +16,15 @@ target_link_libraries(${PROJECT_NAME}
                         "D:/programming/libraries/opencv-4.5.5/build-release/bin/libopencv_world455.dll"
                         "D:/programming/libraries/opencv-4.5.5/build-release/bin/opencv_videoio_ffmpeg455_64.dll"
                         )
+
+
+add_executable(${PROJECT_NAME}_credits
+                        sources/mainCredits.cpp
+                        sources/Credits.cpp
+                        )
+
+include_directories("D:/programming/libraries/opencv-4.5.5/build-release/install/include")
+target_link_libraries(${PROJECT_NAME}_credits
+                        "D:/programming/libraries/opencv-4.5.5/build-release/bin/libopencv_world455.dll"
+                        "D:/programming/libraries/opencv-4.5.5/build-release/bin/opencv_videoio_ffmpeg455_64.dll"
+                        )
