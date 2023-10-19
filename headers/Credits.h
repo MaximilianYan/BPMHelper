@@ -35,13 +35,17 @@ public:
 
 private:
     ///< Render one frame to the output path & reuturn false if frame is empty
-    bool renderFrame(const std::string& outputPath, const int& time);
+    bool renderFrame(const std::string& outputPath, const int& time) const;
     ///< Render one credits line to the "frame" & edit imgLayout erasing rendered part & reuturn false if (the rendered part of the) frame is empty
-    bool renderLine(cv::Mat& frame, cv::Mat& imgLayout, const cv::Point& rootPixel, const int& time);
+    bool renderLine(cv::Mat& frame, cv::Mat& imgLayout, const cv::Point& rootPixel, const int& time) const;
 
+    static double calculateTransparency(const cv::Point& coord, const int& time, double disappearMultiplier);
 
+    static bool isPixelMarkerObject/*   */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an object marker
+    static bool isPixelMarkerEdge/*     */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an edge marker
+    static double getPixelDisappearMul/**/(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Calculate disappear multiplier contained in marker pixel
 
-    static bool isPixelObjectMarker(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is object marker
+    static std::string getOutputFileName(const std::string& outputPath, const int& time);
 
     cv::Mat imgLayout;
     cv::Mat imgText;

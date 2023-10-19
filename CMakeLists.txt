@@ -21,6 +21,7 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(${PROJECT_NAME}_credits
                         sources/mainCredits.cpp
                         sources/Credits.cpp
+                        sources/AverageCounter.cpp
                         )
 
 include_directories("D:/programming/libraries/opencv-4.5.5/build-release/install/include")
