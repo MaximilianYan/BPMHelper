@@ -34,10 +34,10 @@ void Credits::setDisappearDelay(const double& disappearDelay) {
     this->disappearDelay = disappearDelay;
 }
 
-void Credits::render(const std::string& outputPath) {
+void Credits::render(const std::string& outputPath, int frameLimit) {
     // imwrite(outputPath + "Test.png", imgText);
 
-    for (int time = 0; renderFrame(outputPath, time) & time < 10; ++time);
+    for (int time = 1; renderFrame(outputPath, time) && frameLimit; ++time, --frameLimit);
 
 }
 
@@ -103,21 +103,34 @@ bool Credits::renderLine(Mat& frame, Mat& imgLayout, const Point& rootPixel, con
         linePosition = linePosition;
     }
 
+    if (!isFrameNotEmpty) return isFrameNotEmpty;
+
     Mat buffer(this->imgText.size(), this->imgText.type());
+    // static int counter = 0;
+    // buffer.setTo(Vec4b(counter, counter, counter, 255));
+    // counter += 10;
     buffer.setTo(0);
     imgText.copyTo(buffer, mask);
 
-    buffer *= calculateTransparency(linePosition, time, getPixelDisappearMul(imgLayout, linePosition));
+    double transp = 0;
+    buffer *= (transp = calculateTransparency(linePosition, time, getPixelDisappearMul(imgLayout, linePosition)));
 
     buffer.copyTo(frame, mask);
 
     imgLayout.setTo(0, mask);
 
-    return isFrameNotEmpty;
+    return transp > 0;
 }
 
-double Credits::calculateTransparency(const Point& coord, const int& time, double disappearMultiplier) {
-    return 1.;
+double Credits::calculateTransparency(const Point& coord, const int& time, const double& disappearMultiplier) const {
+    return calculateTransparency(time, disappearMultiplier);
+}
+
+double Credits::calculateTransparency(const int& time, const double& disappearMultiplier) const {
+    if ((double)time > (disappearDelay / 2.)) {
+        return 1. - ((double)time - disappearDelay / 2.) / (disappearDelay / disappearMultiplier / 2.);
+    }
+    return (double)time / (disappearDelay / 2.);
 }
 
 bool Credits::isPixelMarkerObject(const Mat& imgLayout, const Point& pixel) {
