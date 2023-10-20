@@ -164,7 +164,7 @@ double Credits::getPixelDisappearMul(const Mat& imgLayout, const Point& pixel) {
 
 string Credits::getOutputFileName(const string& outputPath, const int& time) {
     stringstream res;
-    res << outputPath << "BPMHelper_credits_frame_" << time << ".png";
+    res << outputPath << "BPMHelper_credits_frame_" << setfill('0') << setw(4) << time << ".png";
     string resStr;
     res >> resStr;
     return resStr;
