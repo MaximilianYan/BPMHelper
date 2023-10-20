@@ -37,7 +37,7 @@ void Credits::setDisappearDelay(const double& disappearDelay) {
 void Credits::render(const std::string& outputPath, int frameLimit) {
     // imwrite(outputPath + "Test.png", imgText);
 
-    for (int time = 1; renderFrame(outputPath, time) && frameLimit; ++time, --frameLimit);
+    for (int time = 1; renderFrame(outputPath, time) && --frameLimit; ++time);
 
 }
 
@@ -48,29 +48,28 @@ bool Credits::renderFrame(const std::string& outputPath, const int& time) const 
     this->imgLayout.copyTo(imgLayout);
     frame.setTo(0);
 
-    bool isFrameNotEmpty = false;
+    bool hasEnded = false;
 
     for (Point pixel(0, 0); pixel.x < imgLayout.cols; ++pixel.x) {
         for (pixel.y = 0; pixel.y < imgLayout.rows; ++pixel.y) {
             if (isPixelMarkerObject(imgLayout, pixel)) {
-                isFrameNotEmpty |= renderLine(frame, imgLayout, pixel, time);
+                hasEnded |= renderLine(frame, imgLayout, pixel, time);
             }
         }
     }
 
     imwrite(getOutputFileName(outputPath, time), frame);
 
-    return isFrameNotEmpty;
+    return hasEnded;
 }
 
 bool Credits::renderLine(Mat& frame, Mat& imgLayout, const Point& rootPixel, const int& time) const {
-    bool isFrameNotEmpty = false;
-
     Mat mask(imgText.size(), CV_8UC1); ///< 255 if pixel is contained by current layout
     mask.setTo(0);
 
     AverageCounter<Point> linePosition;
 
+    bool isFrameNotEmpty = false;
     {
         queue<Point> bfsQueue;
         bfsQueue.emplace(rootPixel);
@@ -103,7 +102,7 @@ bool Credits::renderLine(Mat& frame, Mat& imgLayout, const Point& rootPixel, con
         linePosition = linePosition;
     }
 
-    if (!isFrameNotEmpty) return isFrameNotEmpty;
+    if (!isFrameNotEmpty) return false;
 
     Mat buffer(this->imgText.size(), this->imgText.type());
     // static int counter = 0;
@@ -112,25 +111,41 @@ bool Credits::renderLine(Mat& frame, Mat& imgLayout, const Point& rootPixel, con
     buffer.setTo(0);
     imgText.copyTo(buffer, mask);
 
-    double transp = 0;
-    buffer *= (transp = calculateTransparency(linePosition, time, getPixelDisappearMul(imgLayout, linePosition)));
+    bool hasEnded = true;
+    buffer *= calculateTransparency(linePosition, time, getPixelDisappearMul(imgLayout, linePosition), hasEnded);
 
     buffer.copyTo(frame, mask);
 
     imgLayout.setTo(0, mask);
 
-    return transp > 0;
+    return !hasEnded;
 }
 
-double Credits::calculateTransparency(const Point& coord, const int& time, const double& disappearMultiplier) const {
-    return calculateTransparency(time, disappearMultiplier);
+double Credits::calculateTransparency(const Point& coord, const int& time, const double& disappearMultiplier, bool& hasEnded) const {
+    int relativeShift =
+        (double)coord.x / appearVelocity[0] +
+        (double)coord.y / appearVelocity[1];
+    return calculateTransparency(time - relativeShift, disappearMultiplier, hasEnded);
 }
 
-double Credits::calculateTransparency(const int& time, const double& disappearMultiplier) const {
-    if ((double)time > (disappearDelay / 2.)) {
-        return 1. - ((double)time - disappearDelay / 2.) / (disappearDelay / disappearMultiplier / 2.);
+double Credits::calculateTransparency(const int& time, const double& disappearMultiplier, bool& hasEnded) const {
+    hasEnded = false;
+
+    const double halfDelay = disappearDelay / 2.;
+    const double halfDelayMul = halfDelay / disappearMultiplier;
+
+    if (time <= 0) {
+        return 0;
     }
-    return (double)time / (disappearDelay / 2.);
+    if ((double)time <= halfDelay) {
+        return (double)time / halfDelay;
+    }
+    if ((double)time <= (halfDelay + halfDelayMul)) {
+        return 1. - ((double)time - halfDelay) / halfDelayMul;
+    }
+
+    hasEnded = true;
+    return 0;
 }
 
 bool Credits::isPixelMarkerObject(const Mat& imgLayout, const Point& pixel) {

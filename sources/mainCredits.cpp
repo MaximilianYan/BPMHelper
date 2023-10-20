@@ -8,7 +8,7 @@ int main() {
     credits.setAppearVelocity(Vec2d(100, 100));
     credits.setDisappearDelay(10);
 
-    credits.render(OUTPUT_PATH, 20);
+    credits.render(OUTPUT_PATH, 50);
 
     cout << "Program finished 0" << endl;
     return 0;

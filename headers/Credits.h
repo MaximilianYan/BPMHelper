@@ -34,13 +34,15 @@ public:
     void render(const std::string& outputPath, int frameLimit = -1); ///< Render credits to the output path
 
 private:
-    ///< Render one frame to the output path & reuturn false if frame is empty
+    ///< Render one frame to the output path & reuturn false if credits ended
     bool renderFrame(const std::string& outputPath, const int& time) const;
-    ///< Render one credits line to the "frame" & edit imgLayout erasing rendered part & reuturn false if (the rendered part of the) frame is empty
+    ///< Render one credits line to the "frame" & edit imgLayout erasing rendered part & reuturn false if credits ended
     bool renderLine(cv::Mat& frame, cv::Mat& imgLayout, const cv::Point& rootPixel, const int& time) const;
 
-    double calculateTransparency(const cv::Point& coord, const int& time, const double& disappearMultiplier) const; ///< in absolute time & position
-    double calculateTransparency(const int& time, const double& disappearMultiplier) const;                         ///< in relative time
+    ///< in absolute time & position
+    double calculateTransparency(const cv::Point& coord, const int& time, const double& disappearMultiplier, bool& hasEnded) const;
+    ///< in relative time
+    double calculateTransparency(const int& time, const double& disappearMultiplier, bool& hasEnded) const;
 
     static bool isPixelMarkerObject/*   */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an object marker
     static bool isPixelMarkerEdge/*     */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an edge marker
