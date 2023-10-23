@@ -1,6 +1,7 @@
 #include <sstream>
 #include <queue>
 #include <vector>
+#include <cmath>
 
 #include "Credits.h"
 
@@ -37,7 +38,7 @@ void Credits::setDisappearDelay(const double& disappearDelay) {
 void Credits::render(const std::string& outputPath, int frameLimit) {
     // imwrite(outputPath + "Test.png", imgText);
 
-    for (int time = 1; renderFrame(outputPath, time) && --frameLimit; ++time);
+    for (int time = 1; renderFrame(outputPath, time) && --frameLimit; ++time) if (!(time % 20)) cout << "frame " << time << endl;
 
 }
 
@@ -99,7 +100,7 @@ bool Credits::renderLine(Mat& frame, Mat& imgLayout, const Point& rootPixel, con
             bfsQueue.pop();
         }
 
-        linePosition = linePosition;
+        // linePosition = linePosition;
     }
 
     if (!isFrameNotEmpty) return false;
@@ -134,18 +135,24 @@ double Credits::calculateTransparency(const int& time, const double& disappearMu
     const double halfDelay = disappearDelay / 2.;
     const double halfDelayMul = halfDelay / disappearMultiplier;
 
+    double angle = 0.;
+
     if (time <= 0) {
+        angle = 0;
+
+    } else if ((double)time <= halfDelay) {
+        angle = (double)time / halfDelay;
+
+    } else if ((double)time <= (halfDelay + halfDelayMul)) {
+        angle = 1. - ((double)time - halfDelay) / halfDelayMul;
+
+    } else {
+        angle = 0.;
+        hasEnded = true;
         return 0;
     }
-    if ((double)time <= halfDelay) {
-        return (double)time / halfDelay;
-    }
-    if ((double)time <= (halfDelay + halfDelayMul)) {
-        return 1. - ((double)time - halfDelay) / halfDelayMul;
-    }
 
-    hasEnded = true;
-    return 0;
+    return sin(angle * CV_PI / 2.);
 }
 
 bool Credits::isPixelMarkerObject(const Mat& imgLayout, const Point& pixel) {
