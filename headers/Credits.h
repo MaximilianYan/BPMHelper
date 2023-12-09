@@ -43,6 +43,8 @@ private:
     double calculateTransparency(const cv::Point& coord, const int& time, const double& disappearMultiplier, bool& hasEnded) const;
     ///< in relative time
     double calculateTransparency(const int& time, const double& disappearMultiplier, bool& hasEnded) const;
+    ///< math function like sin(), but f(0) = 0, f(1) = 1, f(2) = 0
+    static double waveFunction(double arg);
 
     static bool isPixelMarkerObject/*   */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an object marker
     static bool isPixelMarkerEdge/*     */(const cv::Mat& imgLayout, const cv::Point& pixel); ///< Check if pixel is an edge marker

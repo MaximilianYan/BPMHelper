@@ -152,7 +152,17 @@ double Credits::calculateTransparency(const int& time, const double& disappearMu
         return 0;
     }
 
-    return sin(angle * CV_PI / 2.);
+    return waveFunction(angle);
+}
+
+double Credits::waveFunction(double arg) {
+    ///< Sinus variant
+    return sin(arg * CV_PI / 2.);
+
+    ///< Linear variant
+    // if (arg > 1)
+    //     return 2 - arg;
+    // return arg;
 }
 
 bool Credits::isPixelMarkerObject(const Mat& imgLayout, const Point& pixel) {
